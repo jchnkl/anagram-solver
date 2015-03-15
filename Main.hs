@@ -98,14 +98,11 @@ solver' :: Word         -- ^ The input for which anagrams should be generated
         -> [Word]       -- ^ The accumulator for the result
         -> [Word]
 solver' input fg sg part_word acc
-    | isWord part_word fg =
-        if L.null part_edges
-            then part_word:acc
-            else concatMap (part_solve $ part_word:acc) part_edges
-    | otherwise =
-        if L.null part_edges
-            then acc
-            else concatMap (part_solve acc) part_edges
+    | isWord part_word fg
+        && null part_edges = part_word:acc
+    | isWord part_word fg  = concatMap (part_solve $ part_word:acc) part_edges
+    | null part_edges      = acc
+    | otherwise            = concatMap (part_solve acc) part_edges
     where
     part_edges = partialEdges input sg
     part_solve acc' (nc, sg') = solver' input fg sg' (part_word ++ [nc]) acc'
