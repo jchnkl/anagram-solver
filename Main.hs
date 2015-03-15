@@ -80,51 +80,35 @@ main = do
 
 -- filterEdges word = 
 
--- filter ((`elem` "helloworld") . fst) $ edges $ Dawg.submap "" (buildGraph dict)
-filterEdges :: (Eq a, Enum a) => [a] -> DAWG a b c -> [(a, DAWG a b c)]
-filterEdges w = filter ((`elem` w) . fst) . edges
+-- | Returns all edges of a (sub)graph where the symbol (`a`) of an edge is an
+-- element of `[a]`. So, for example if `[a]` is `"abc"` (or: `['a','b','c']`),
+-- the result will consist of the subgraphs for the nodes which match `'a'`,
+-- `'b'` and `'c'`.
+partialEdges :: (Eq a, Enum a) => [a] -> DAWG a b c -> [(a, DAWG a b c)]
+partialEdges w = filter ((`elem` w) . fst) . edges
 
-solve _ _ _ wordacc _ [] = wordacc
-solve fullgraph inword subgraph wordacc lastword (c:cs)
-    | isWord curword fullgraph =
-        trace ("isWord: " ++ curword ++ "; fedges: " ++ show (map fst fedges)) $
-        concatMap (\(l,g) -> solve fullgraph inword g (curword:wordacc) (lastword ++ [c,l]) cs) fedges
-    | otherwise            =
-        trace ("! isWord: " ++ curword ++ "; fedges: " ++ show (map fst fedges)) $
-        concatMap (\(l,g) -> solve fullgraph inword g wordacc (lastword ++ [c,l]) cs) fedges
+-- | Returns all full and partial anagrams for a `Word`
+solver :: AnagramGraph -> Word -> [Word]
+solver g input = solver' input g g "" []
 
-
-    where
-    -- fedges = trace ("fedges (" ++ curword ++ "): ") $ filterEdges inword $ Dawg.submap curword fullgraph
-    fedges = filterEdges inword $ Dawg.submap curword fullgraph
-    -- subgraph = trace curword $ Dawg.submap curword fullgraph
-    curword = lastword ++ [c]
-
-solve'' :: AnagramGraph -> Word -> [Word]
-solve'' g inword = solve' g g "" inword []
-
-solve' fg sg mword inword acc
-    -- passiert nur beim letzten
-    -- | isEndOfWord mword fg && isWord mword fg = mword:acc
-    | isWord mword fg =
-        let fes = map fst $ filterEdges inword sg in
-        let fes' = filterEdges inword sg in
-        if L.null fes'
-            then mword:acc
-            else concatMap (\(nc,sg') -> solve' fg sg' (mword ++ [nc]) inword (mword:acc))
-                    $ filterEdges inword sg
-        -- in res
-        -- in trace ("isWord: mword: " ++ mword ++ "; res:" ++ show res ++ "; edges: " ++ show fes) $ res
-    -- | isEndOfWord mword fg = acc
+solver' :: Word         -- ^ The input for which anagrams should be generated
+        -> AnagramGraph -- ^ The full graph which contains the whole dictionary
+        -> AnagramGraph -- ^ The partial graph for the recursion
+        -> Word         -- ^ The partial word for the recursion
+        -> [Word]       -- ^ The accumulator for the result
+        -> [Word]
+solver' input fg sg part_word acc
+    | isWord part_word fg =
+        if L.null part_edges
+            then part_word:acc
+            else concatMap (part_solve $ part_word:acc) part_edges
     | otherwise =
-        let fes = map fst $ filterEdges inword sg in
-        let fes' = filterEdges inword sg in
-        if L.null fes'
+        if L.null part_edges
             then acc
-            else concatMap (\(nc,sg') -> solve' fg sg' (mword ++ [nc]) inword acc)
-                $ filterEdges inword sg
-        -- in res
-        -- in trace ("otherwise: mword: " ++ mword ++ "; res:" ++ show res ++ "; edges: " ++ show fes) $ res
+            else concatMap (part_solve acc) part_edges
+    where
+    part_edges = partialEdges input sg
+    part_solve acc' (nc, sg') = solver' input fg sg' (part_word ++ [nc]) acc'
 
 {-
 solve' '' {graph:"dehlorw"} "helloworld" -> [('h', subgraph)]
