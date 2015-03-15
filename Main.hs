@@ -97,15 +97,18 @@ recSolver :: Word         -- ^ The input for which anagrams should be generated
           -> [Word]       -- ^ The accumulator for the result
           -> [Word]
 recSolver input fg sg part_word acc
-    | isWord && isEndOfWord = part_word:acc
-    | isWord                = concatMap (part_solve $ part_word:acc) part_edges
-    | isEndOfWord           = acc
-    | otherwise             = concatMap (part_solve acc) part_edges
+    | isWord && exitCondition = part_word:acc
+    | isWord                  = concatMap (part_solve $ part_word:acc) part_edges
+    | exitCondition           = acc
+    | otherwise               = concatMap (part_solve acc) part_edges
     where
     -- is the current partial word a real word from the dictionary?
     isWord                    = isJust $ Dawg.lookup part_word fg
     -- is end of graph (== no more edges) reached?
     isEndOfWord               = null part_edges
+    -- is the current partial word longer than the input word?
+    isTooLong                 = length part_word >= length input
+    exitCondition             = isEndOfWord || isTooLong
     part_edges                = partialEdges input sg
     part_solve acc' (nc, sg') = recSolver input fg sg' (part_word ++ [nc]) acc'
 
