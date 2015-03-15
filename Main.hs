@@ -45,11 +45,7 @@ getGraph = fmap (buildGraph . words) (readFile defaultDictionary)
 --
 -- hellow
 
-isWord :: Word -> AnagramGraph -> Bool
-isWord w = isJust . Dawg.lookup w
 
-isEndOfWord :: Word -> AnagramGraph -> Bool
-isEndOfWord w = L.null . Dawg.edges . Dawg.submap w
 
 -- solve :: AnagramGraph -> Word -> [Word]
 
@@ -98,14 +94,17 @@ solver' :: Word         -- ^ The input for which anagrams should be generated
         -> [Word]       -- ^ The accumulator for the result
         -> [Word]
 solver' input fg sg part_word acc
-    | isWord part_word fg
-        && null part_edges = part_word:acc
-    | isWord part_word fg  = concatMap (part_solve $ part_word:acc) part_edges
-    | null part_edges      = acc
-    | otherwise            = concatMap (part_solve acc) part_edges
+    | isWord && isEndOfWord = part_word:acc
+    | isWord                = concatMap (part_solve $ part_word:acc) part_edges
+    | isEndOfWord           = acc
+    | otherwise             = concatMap (part_solve acc) part_edges
     where
-    part_edges = partialEdges input sg
-    part_solve acc' (nc, sg') = solver' input fg sg' (part_word ++ [nc]) acc'
+    -- is the current partial word a real word from the dictionary?
+    isWord                    = isJust $ Dawg.lookup part_word fg
+    -- is end of graph (== no more edges) reached?
+    isEndOfWord               = null part_edges
+    part_edges                = partialEdges input sg
+    part_solve acc' (nc, sg') = recSolver input fg sg' (part_word ++ [nc]) acc'
 
 {-
 solve' '' {graph:"dehlorw"} "helloworld" -> [('h', subgraph)]
