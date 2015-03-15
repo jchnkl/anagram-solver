@@ -88,15 +88,15 @@ partialEdges w = filter ((`elem` w) . fst) . edges
 
 -- | Returns all full and partial anagrams for a `Word`
 solver :: AnagramGraph -> Word -> [Word]
-solver g input = solver' input g g "" []
+solver g input = recSolver input g g "" []
 
-solver' :: Word         -- ^ The input for which anagrams should be generated
-        -> AnagramGraph -- ^ The full graph which contains the whole dictionary
-        -> AnagramGraph -- ^ The partial graph for the recursion
-        -> Word         -- ^ The partial word for the recursion
-        -> [Word]       -- ^ The accumulator for the result
-        -> [Word]
-solver' input fg sg part_word acc
+recSolver :: Word         -- ^ The input for which anagrams should be generated
+          -> AnagramGraph -- ^ The full graph which contains the whole dictionary
+          -> AnagramGraph -- ^ The partial graph for the recursion
+          -> Word         -- ^ The partial word for the recursion
+          -> [Word]       -- ^ The accumulator for the result
+          -> [Word]
+recSolver input fg sg part_word acc
     | isWord && isEndOfWord = part_word:acc
     | isWord                = concatMap (part_solve $ part_word:acc) part_edges
     | isEndOfWord           = acc
