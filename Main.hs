@@ -6,14 +6,12 @@ import qualified Data.List as L
 
 import Debug.Trace
 
-data WordMark = WordMark
-    deriving (Eq, Ord, Read, Show)
 
 type Word = String
-type AnagramGraph = DAWG Char () WordMark
+type AnagramGraph = DAWG Char () ()
 
 buildGraph :: [String] -> AnagramGraph
-buildGraph = Dawg.fromList . flip zip (repeat WordMark) -- map (\s -> (s, WordMark))
+buildGraph = Dawg.fromList . flip zip (repeat ())
 
 defaultDictionary :: FilePath
 defaultDictionary = "/usr/share/dict/cracklib-small"
