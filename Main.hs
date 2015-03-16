@@ -117,7 +117,8 @@ validEdges chars = filter (isValidEdge chars) . G.edges
 -- | Find all anagrams for a given input word
 internalSolver :: WordSet   -- ^ `WordSet` for `isWord`
                -> WordGraph -- ^ The `DAWG` containing all valid words from the dictionary
-               -> CharList  -- ^ Partial word accumulator for recursion. Initially empty
+               -> ShowS     -- ^ Partial word accumulator for recursion. Initially empty: `showString ""`
+                            --   TODO: Replace `CharList` with an unordered multiset
                -> CharList  -- ^ `CharList` of valid symbols. Initially equal to the input word
                -> WordSet   -- ^ Result `WordSet` accumulator for recursion. Initially empty
                -> WordSet   -- ^ All found anagrams
@@ -127,7 +128,7 @@ internalSolver wset graph word chars result
     where
     exit              = L.null edges || L.null chars
     edges             = validEdges chars graph
-    word' c'          = word ++ [c']
+    word' c'          = word . showString [c']
     chars' c'         = c' `L.delete` chars
-    result'           = if isWord word wset then S.insert word result else result
+    result'           = if isWord (word "") wset then S.insert (word "") result else result
     solve (c',graph') = internalSolver wset graph' (word' c') (chars' c') result'
