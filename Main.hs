@@ -100,17 +100,28 @@ main = do
     graph <- fmap (buildGraph . words) (readFile defaultDictionary)
     putStrLn (map fst $ G.edges $ G.submap "a" $ graph)
 
+-- | Given a `Word` and a `WordSet` quickly check if this is a valid word from
+-- the dictionary. Should be O(1) and therefor fast than the lookup in the graph
 isWord :: Word -> WordSet -> Bool
 isWord = S.member
 
+-- | Check if a given graph edge is a valid candidate. For this, the edge symbol
+-- must be contained within a given `CharList`.
 isValidEdge :: CharList -> (Char, WordGraph) -> Bool
 isValidEdge chars (c',_) = c' `elem` chars
 
+-- | Filter all valid edges based on their symbol value. See `isValidEdge`.
 validEdges :: CharList -> WordGraph -> [(Char, WordGraph)]
 validEdges chars = filter (isValidEdge chars) . G.edges
 
-internalSolver :: WordSet -> String -> WordSet -> CharList -> WordGraph -> WordSet
-internalSolver wset wort result chars g
+-- | Find all anagrams for a given input word
+internalSolver :: WordSet   -- ^ `WordSet` for `isWord`
+               -> WordGraph -- ^ The `DAWG` containing all valid words from the dictionary
+               -> CharList  -- ^ Partial word accumulator for recursion. Initially empty
+               -> CharList  -- ^ `CharList` of valid symbols. Initially equal to the input word
+               -> WordSet   -- ^ Result `WordSet` accumulator for recursion. Initially empty
+               -> WordSet   -- ^ All found anagrams
+internalSolver wset graph wort chars result
     | exit      = result'
     | otherwise = S.unions $ map solve edges
     where
