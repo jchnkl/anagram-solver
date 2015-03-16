@@ -15,17 +15,6 @@ import qualified Data.HashSet as S
 
 import Debug.Trace
 
--- So for example, if your input string is "helloworld", you're going to first
--- call your recursive tester function with "", passing the remaining available
--- letters "helloworld" as a 2nd parameter. Function sees that "" isn't a word,
--- but child "h" does exist. So it calls itself with "h", and "elloworld".
--- Function sees that "h" isn't a word, but child "e" exists. So it calls itself
--- with "he" and "lloworld". Function sees that "e" is marked, so "he" is
--- a word, take note. Further, child "l" exists, so next call is "hel" with
--- "loworld". It will next find "hell", then "hello", then will have to back out
--- and probably next find "hollow", before backing all the way out to the empty
--- string again and then starting with "e" words next.
-
 type Depth = Int
 type Length = Int
 
