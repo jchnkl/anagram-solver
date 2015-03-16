@@ -1,6 +1,6 @@
 import Control.Applicative
 import Data.Maybe
-import Data.DAWG.Static
+import Data.DAWG.Static (DAWG)
 import qualified Data.DAWG.Static as G
 import qualified Data.List as L
 
@@ -101,7 +101,7 @@ bruteForceSolver t w = concatMap (flip lookupAnagrams t)
 main :: IO ()
 main = do
     graph <- fmap (buildGraph . words) (readFile defaultDictionary)
-    putStrLn (map fst $ edges $ submap "a" $ graph)
+    putStrLn (map fst $ G.edges $ G.submap "a" $ graph)
 
 isWord :: Word -> WordSet -> Bool
 isWord = S.member
