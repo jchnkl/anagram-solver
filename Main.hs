@@ -28,8 +28,12 @@ type WordSet = HashSet Word
 -- | The DAWG which contains every word from the dictionary
 type WordGraph = DAWG Char () ()
 
+-- | A `Tag` is a sorted `Word`, used as Key for the `WordTable`
 type Tag = String
-type AnagramTable = HashMap Tag [Word]
+
+-- | A `HashMap` which holds a list for all similar `Word`s
+-- similar means: `sort word1 == sort word2`
+type WordTable = HashMap Tag [Word]
 
 defaultDictionary :: FilePath
 defaultDictionary = "/usr/share/dict/cracklib-small"
@@ -49,20 +53,20 @@ buildGraph = G.fromLang
 getGraph :: IO WordGraph
 getGraph = buildGraph <$> readDictionary
 
-buildTable :: [Word] -> AnagramTable
+buildTable :: [Word] -> WordTable
 buildTable = H.map D.toList . H.fromListWith D.append . map toTuple
     where toTuple w = (toTag w, D.singleton w)
 
-getTable :: IO AnagramTable
+getTable :: IO WordTable
 getTable = buildTable <$> readDictionary
 
 toTag :: String -> Tag
 toTag = L.sort . map C.toLower
 
-lookupAnagrams :: Word -> AnagramTable -> [Word]
+lookupAnagrams :: Word -> WordTable -> [Word]
 lookupAnagrams w = fromMaybe [] . H.lookup (toTag w)
 
-bruteForceSolver :: AnagramTable -> Word -> [Word]
+bruteForceSolver :: WordTable -> Word -> [Word]
 bruteForceSolver t w = concatMap (flip lookupAnagrams t)
                                  (filter (not . null) . L.subsequences $ L.sort w)
 
