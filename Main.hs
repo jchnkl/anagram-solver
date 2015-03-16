@@ -106,22 +106,17 @@ isWord = S.member
 isValidEdge :: CharList -> (Char, WordGraph) -> Bool
 isValidEdge chars (c',_) = c' `elem` chars
 
-internalSolver :: WordSet -> String -> WordSet -> String -> WordGraph -> WordSet -- [String]
-internalSolver wset wort acc [] _
-    | isWord wort wset = S.insert wort acc
-    | otherwise   = acc
+validEdges :: CharList -> WordGraph -> [(Char, WordGraph)]
+validEdges chars = filter (isValidEdge chars) . G.edges
 
-internalSolver wset wort acc part g
-    | L.null validEdges && isWord wort wset = S.insert wort acc
-    | L.null validEdges = acc
-    | otherwise = S.unions $ map findAnagrams validEdges
-
+internalSolver :: WordSet -> String -> WordSet -> CharList -> WordGraph -> WordSet
+internalSolver wset wort result chars g
+    | exit      = result'
+    | otherwise = S.unions $ map solve edges
     where
-
-    validEdges :: [(Char, WordGraph)]
-    validEdges = filter (isValidEdge part) (G.edges g)
-
-    findAnagrams :: (Char, WordGraph) -> WordSet
-    findAnagrams (c',g')
-        | isWord wort wset = internalSolver wset (wort++[c']) (S.insert wort acc) (c' `L.delete` part) g'
-        | otherwise          = internalSolver wset (wort++[c']) acc (c' `L.delete` part) g'
+    exit              = L.null edges || L.null chars
+    edges             = validEdges chars graph
+    word' c'          = word ++ [c']
+    chars' c'         = c' `L.delete` chars
+    result'           = if isWord word wset then S.insert word result else result
+    solve (c',graph') = internalSolver wset graph' (word' c') (chars' c') result'
