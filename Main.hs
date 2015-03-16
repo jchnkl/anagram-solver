@@ -15,9 +15,6 @@ import qualified Data.HashSet as S
 
 import Debug.Trace
 
-type Depth = Int
-type Length = Int
-
 -- | A `Word` is either the input for the anagram solver or the result
 type Word = String
 
