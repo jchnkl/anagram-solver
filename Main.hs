@@ -103,16 +103,6 @@ main = do
     graph <- fmap (buildGraph . words) (readFile defaultDictionary)
     putStrLn (map fst $ edges $ submap "a" $ graph)
 
--- | Returns all edges of a (sub)graph where the symbol (`a`) of an edge is an
--- element of `[a]`. So, for example if `[a]` is `"abc"` (or: `['a','b','c']`),
--- the result will consist of the subgraphs for the nodes which match `'a'`,
--- `'b'` and `'c'`.
-partialEdges :: (Eq a, Enum a)
-             => [a]               -- ^ List of symbols which an edge should match on
-             -> DAWG a b c        -- ^ The graph where edges should be filtered out
-             -> [(a, DAWG a b c)]
-partialEdges w = filter ((`elem` w) . fst) . edges
-
 isWord :: Word -> WordSet -> Bool
 isWord = S.member
 
