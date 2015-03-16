@@ -28,29 +28,14 @@ type WordSet = HashSet Word
 -- | The DAWG which contains every word from the dictionary
 type WordGraph = DAWG Char () ()
 
-type Label = String
-type AnagramTable = HashMap Label [Word]
-type LabelSet = HashSet Label
-type CharSet = HashSet Char
-
-data AnagramCtx = AnagramCtx
-    { labelSet :: LabelSet
-    , anagramTable :: AnagramTable
-    , anagramGraph :: WordGraph
-    }
-    deriving (Eq, Show)
+type Tag = String
+type AnagramTable = HashMap Tag [Word]
 
 quickNub :: (Eq a, Hashable a) => [a] -> [a]
 quickNub = S.toList . S.fromList
 
 defaultDictionary :: FilePath
 defaultDictionary = "/usr/share/dict/cracklib-small"
-
-buildLabelSet :: [String] -> LabelSet
-buildLabelSet = S.fromList . quickNub . map L.sort
-
-getLabelSet :: IO LabelSet
-getLabelSet = buildLabelSet . words <$> readFile defaultDictionary
 
 buildWordSet :: [String] -> WordSet
 buildWordSet = S.fromList
@@ -66,16 +51,16 @@ getGraph = fmap (buildGraph . words) (readFile defaultDictionary)
 
 buildTable :: [Word] -> AnagramTable
 buildTable = H.map D.toList . H.fromListWith D.append . map toTuple
-    where toTuple w = (toLabel w, D.singleton w)
+    where toTuple w = (toTag w, D.singleton w)
 
 getTable :: IO AnagramTable
 getTable = fmap (buildTable . words) (readFile defaultDictionary)
 
-toLabel :: String -> Label
-toLabel = L.sort . map C.toLower
+toTag :: String -> Tag
+toTag = L.sort . map C.toLower
 
 lookupAnagrams :: Word -> AnagramTable -> [Word]
-lookupAnagrams w = fromMaybe [] . H.lookup (toLabel w)
+lookupAnagrams w = fromMaybe [] . H.lookup (toTag w)
 
 bruteForceSolver :: AnagramTable -> Word -> [Word]
 bruteForceSolver t w = concatMap (flip lookupAnagrams t)
