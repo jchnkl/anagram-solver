@@ -132,3 +132,6 @@ internalSolver wset graph word chars result
     chars' c'         = c' `L.delete` chars
     result'           = if isWord (word "") wset then S.insert (word "") result else result
     solve (c',graph') = internalSolver wset graph' (word' c') (chars' c') result'
+
+solver :: WordSet -> WordGraph -> Word -> [Word]
+solver ws g input = S.toList $ internalSolver ws g (showString "") input S.empty
