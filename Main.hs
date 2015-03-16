@@ -28,9 +28,18 @@ import Debug.Trace
 
 type Depth = Int
 type Length = Int
+
+-- | A `Word` is either the input for the anagram solver or the result
 type Word = String
--- type LabelGraph
+
+-- | This is distinctive from a `String`: we are working with list operations on
+-- a list of `Char`s, e.g. L.elem and L.delete
+type CharList = [Char]
+
+-- | Just a set of valid words for fast checks with `HashSet.member`
 type WordSet = HashSet Word
+
+-- | The DAWG which contains every word from the dictionary
 type WordGraph = DAWG Char () ()
 
 type Label = String
