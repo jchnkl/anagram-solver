@@ -121,7 +121,7 @@ internalSolver :: WordSet   -- ^ `WordSet` for `isWord`
                -> CharList  -- ^ `CharList` of valid symbols. Initially equal to the input word
                -> WordSet   -- ^ Result `WordSet` accumulator for recursion. Initially empty
                -> WordSet   -- ^ All found anagrams
-internalSolver wset graph wort chars result
+internalSolver wset graph word chars result
     | exit      = result'
     | otherwise = S.unions $ map solve edges
     where
