@@ -91,11 +91,11 @@ getTable = fmap (buildTable . words) (readFile defaultDictionary)
 toLabel :: String -> Label
 toLabel = L.sort . map C.toLower
 
-findAnagrams :: Word -> AnagramTable -> [Word]
-findAnagrams w = fromMaybe [] . H.lookup (toLabel w)
+lookupAnagrams :: Word -> AnagramTable -> [Word]
+lookupAnagrams w = fromMaybe [] . H.lookup (toLabel w)
 
 bruteForceSolver :: AnagramTable -> Word -> [Word]
-bruteForceSolver t w = concatMap (flip findAnagrams t)
+bruteForceSolver t w = concatMap (flip lookupAnagrams t)
                                  (filter (not . null) . L.subsequences $ L.sort w)
 
 main :: IO ()
