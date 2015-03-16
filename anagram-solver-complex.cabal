@@ -22,6 +22,9 @@ executable anagram-solver-complex
 
   build-depends:       base >=4.7 && <4.8,
                        dawg >= 0.11,
+                       unordered-containers,
+                       hashable,
+                       dlist,
                        scotty >= 0.9
 
   -- hs-source-dirs:      
