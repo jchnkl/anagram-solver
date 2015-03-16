@@ -74,9 +74,6 @@ getWordSet = buildWordSet . words <$> readFile defaultDictionary
 
 buildGraph :: [String] -> WordGraph
 buildGraph = G.fromLang
--- buildGraph = G.fromList . flip zip (repeat ()) . quickNub . map L.sort
--- buildGraph = G.fromLang . quickNub  . map L.sort
--- buildGraph = G.fromLang -- . quickNub  . map L.sort
 
 getGraph :: IO WordGraph
 getGraph = fmap (buildGraph . words) (readFile defaultDictionary)
