@@ -31,9 +31,6 @@ type WordGraph = DAWG Char () ()
 type Tag = String
 type AnagramTable = HashMap Tag [Word]
 
-quickNub :: (Eq a, Hashable a) => [a] -> [a]
-quickNub = S.toList . S.fromList
-
 defaultDictionary :: FilePath
 defaultDictionary = "/usr/share/dict/cracklib-small"
 
