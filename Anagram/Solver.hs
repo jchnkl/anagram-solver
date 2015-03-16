@@ -1,3 +1,5 @@
+module Anagram.Solver where
+
 import Control.Applicative
 import Data.Maybe
 import Data.DAWG.Static (DAWG)
@@ -69,11 +71,6 @@ lookupAnagrams w = fromMaybe [] . H.lookup (toTag w)
 bruteForceSolver :: WordTable -> Word -> [Word]
 bruteForceSolver t w = concatMap (flip lookupAnagrams t)
                                  (filter (not . null) . L.subsequences $ L.sort w)
-
-main :: IO ()
-main = do
-    graph <- fmap (buildGraph . words) (readFile defaultDictionary)
-    putStrLn (map fst $ G.edges $ G.submap "a" $ graph)
 
 -- | Given a `Word` and a `WordSet` quickly check if this is a valid word from
 -- the dictionary. Should be O(1) and therefor fast than the lookup in the graph
