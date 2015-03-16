@@ -297,33 +297,31 @@ dict = ["hell","hello","he","eh","eel","lee","hollow","el","le","low","zynismn"]
 --             else acc
 --             ) (G.edges g') -- (filter ((c'==) . fst) $ G.edges g')
 
-yeah :: WordSet -> String -> WordSet -> String -> WordGraph -> WordSet -- [String]
-yeah lset wort acc [] _
-    | isWord wort = S.insert wort acc
+isWord :: Word -> WordSet -> Bool
+isWord = S.member
+
+isValidEdge :: CharList -> (Char, WordGraph) -> Bool
+isValidEdge chars (c',_) = c' `elem` chars
+
+internalSolver :: WordSet -> String -> WordSet -> String -> WordGraph -> WordSet -- [String]
+internalSolver wset wort acc [] _
+    | isWord wort wset = S.insert wort acc
     | otherwise   = acc
-    where
-    isWord = flip S.member lset
-yeah lset wort acc part g
-        --                     trace ("yeah: part: " ++ part
-        --                            ++ "; validEdges: " ++ show (map fst $ validEdges g)
-        --                            ++ "; wort: " ++ wort
-        --                           )
-        --         $ concatMap freak . validEdges $ g
-        | L.null validEdges && isWord wort = S.insert wort acc
-        | L.null validEdges = acc
-        | otherwise = S.unions $ map freak validEdges
+
+internalSolver wset wort acc part g
+    | L.null validEdges && isWord wort wset = S.insert wort acc
+    | L.null validEdges = acc
+    | otherwise = S.unions $ map findAnagrams validEdges
 
     where
-    isWord = flip S.member lset
-    -- isValidEdge :: (Char, WordGraph) -> Bool
-    isValidEdge (c',_) = c' `elem` part
-    -- validEdges :: WordGraph -> [(Char, WordGraph)]
-    validEdges = filter isValidEdge (G.edges g)
 
-    freak :: (Char, WordGraph) -> WordSet -- [String]
-    freak (c',g') -- = trace ("freak: " ++ [c'])
-        | isWord wort = yeah lset (wort++[c']) (S.insert wort acc) (c' `L.delete` part) g'
-        | otherwise   = yeah lset (wort++[c']) acc (c' `L.delete` part) g'
+    validEdges :: [(Char, WordGraph)]
+    validEdges = filter (isValidEdge part) (G.edges g)
+
+    findAnagrams :: (Char, WordGraph) -> WordSet
+    findAnagrams (c',g')
+        | isWord wort wset = internalSolver wset (wort++[c']) (S.insert wort acc) (c' `L.delete` part) g'
+        | otherwise          = internalSolver wset (wort++[c']) acc (c' `L.delete` part) g'
 
                   -- $ yeah (wort++[c']) acc (c' `L.delete` part) g'
 
