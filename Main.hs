@@ -37,24 +37,27 @@ quickNub = S.toList . S.fromList
 defaultDictionary :: FilePath
 defaultDictionary = "/usr/share/dict/cracklib-small"
 
+readDictionary :: IO [String]
+readDictionary = words <$> readFile defaultDictionary
+
 buildWordSet :: [String] -> WordSet
 buildWordSet = S.fromList
 
 getWordSet :: IO WordSet
-getWordSet = buildWordSet . words <$> readFile defaultDictionary
+getWordSet = buildWordSet <$> readDictionary
 
 buildGraph :: [String] -> WordGraph
 buildGraph = G.fromLang
 
 getGraph :: IO WordGraph
-getGraph = fmap (buildGraph . words) (readFile defaultDictionary)
+getGraph = buildGraph <$> readDictionary
 
 buildTable :: [Word] -> AnagramTable
 buildTable = H.map D.toList . H.fromListWith D.append . map toTuple
     where toTuple w = (toTag w, D.singleton w)
 
 getTable :: IO AnagramTable
-getTable = fmap (buildTable . words) (readFile defaultDictionary)
+getTable = buildTable <$> readDictionary
 
 toTag :: String -> Tag
 toTag = L.sort . map C.toLower
