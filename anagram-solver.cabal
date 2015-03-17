@@ -1,7 +1,8 @@
 name:                anagram-solver
 version:             0.1.0.0
 synopsis:            An efficient anagram solver
-description:         An efficient anagram solver implemented using a DAWG
+description:         Efficient anagram solving with recursive backtracking and
+                     a directed acyclic word graph
 license:             BSD2
 license-file:        LICENSE
 author:              Jochen Keil
