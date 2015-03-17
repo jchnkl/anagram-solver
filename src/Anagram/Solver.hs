@@ -40,8 +40,8 @@ type WordGraph = DAWG Char () ()
 buildWordSet :: [String] -> WordSet
 buildWordSet = S.fromList . map L.reverse
 
-buildGraph :: [String] -> WordGraph
-buildGraph = G.fromLang
+buildWordGraph :: [String] -> WordGraph
+buildWordGraph = G.fromLang
 
 -- | Given a `Word` and a `WordSet` quickly check if this is a valid word from
 -- the dictionary. Should be O(1) and therefor fast than the lookup in the graph
@@ -98,14 +98,14 @@ getWordSet :: IO WordSet
 getWordSet = buildWordSet <$> readDictionary
 
 getWordGraph :: IO WordGraph
-getWordGraph = buildGraph <$> readDictionary
+getWordGraph = buildWordGraph <$> readDictionary
 
-buildTable :: [Word] -> WordTable
-buildTable = H.map D.toList . H.fromListWith D.append . map toTuple
+buildWordTable :: [Word] -> WordTable
+buildWordTable = H.map D.toList . H.fromListWith D.append . map toTuple
     where toTuple w = (toTag w, D.singleton w)
 
 getWordTable :: IO WordTable
-getWordTable = buildTable <$> readDictionary
+getWordTable = buildWordTable <$> readDictionary
 
 -- | Faster than `Data.List.nub` at the expense of O(n) memory
 quickNub :: (Eq a, Hashable a) => [a] -> [a]
