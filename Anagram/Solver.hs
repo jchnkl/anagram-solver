@@ -1,21 +1,20 @@
 module Anagram.Solver where
 
-import Control.Applicative
-import Data.Maybe
-import Data.DAWG.Static (DAWG)
-import qualified Data.DAWG.Static as G
-import qualified Data.List as L
+import Control.Applicative ((<$>))
+import Data.Maybe (fromMaybe)
 
-import qualified Data.DList as D
-import Data.HashMap.Lazy (HashMap)
-import qualified Data.HashMap.Lazy as H
 import qualified Data.Char as C
+import qualified Data.List as L
+import qualified Data.DList as D
 
 import Data.HashSet (HashSet)
-import Data.Hashable (Hashable)
 import qualified Data.HashSet as S
 
-import Debug.Trace
+import Data.DAWG.Static (DAWG)
+import qualified Data.DAWG.Static as G
+
+import Data.HashMap.Lazy (HashMap)
+import qualified Data.HashMap.Lazy as H
 
 -- | A `Word` is either the input for the anagram solver or the result
 type Word = String
