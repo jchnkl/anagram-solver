@@ -38,7 +38,7 @@ type WordSet = HashSet Word
 type WordGraph = DAWG Char () ()
 
 buildWordSet :: [String] -> WordSet
-buildWordSet = S.fromList
+buildWordSet = S.fromList . map L.reverse
 
 buildGraph :: [String] -> WordGraph
 buildGraph = G.fromLang
@@ -60,7 +60,7 @@ validEdges chars = filter (isValidEdge chars) . G.edges
 -- | Find all anagrams for a given input word
 internalSolver :: WordSet   -- ^ `WordSet` for `isWord`
                -> WordGraph -- ^ The `DAWG` containing all valid words from the dictionary
-               -> ShowS     -- ^ Partial word accumulator for recursion. Initially empty: `showString ""`
+               -> CharList  -- ^ Partial word accumulator for recursion. Initially empty.
                -> CharList  -- ^ `CharList` of valid symbols. Initially equal to the input word
                             --    (TODO: Replace `CharList` with an unordered multiset)
                -> WordSet   -- ^ Result `WordSet` accumulator for recursion. Initially empty
@@ -71,13 +71,13 @@ internalSolver wset graph word chars result
     where
     exit              = L.null edges || L.null chars
     edges             = validEdges chars graph
-    word' c'          = word . showString [c']
+    word' c'          = c':word
     chars' c'         = c' `L.delete` chars
-    result'           = if isWord (word "") wset then S.insert (word "") result else result
+    result'           = if isWord word wset then S.insert (L.reverse word) result else result
     solve (c',graph') = internalSolver wset graph' (word' c') (chars' c') result'
 
 solver :: WordSet -> WordGraph -> Word -> [Word]
-solver ws g input = S.toList $ internalSolver ws g (showString "") input S.empty
+solver ws g input = S.toList $ internalSolver ws g "" input S.empty
 
 #ifdef ANAGRAM_SOLVER_TEST_CASES
 -- | A `Tag` is a sorted `Word`, used as Key for the `WordTable`
