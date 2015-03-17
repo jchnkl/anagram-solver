@@ -28,7 +28,7 @@ import qualified Data.HashMap.Lazy as H
 type Word = String
 
 -- | This is distinctive from a `String`: we are working with list operations on
--- a list of `Char`s, e.g. L.elem and L.delete
+-- a list of `Char`s, e.g. Data.List.elem and Data.List.delete
 type CharList = [Char]
 
 -- | Just a set of valid words for fast checks with `HashSet.member`
@@ -61,8 +61,8 @@ validEdges chars = filter (isValidEdge chars) . G.edges
 internalSolver :: WordSet   -- ^ `WordSet` for `isWord`
                -> WordGraph -- ^ The `DAWG` containing all valid words from the dictionary
                -> ShowS     -- ^ Partial word accumulator for recursion. Initially empty: `showString ""`
-                            --   TODO: Replace `CharList` with an unordered multiset
                -> CharList  -- ^ `CharList` of valid symbols. Initially equal to the input word
+                            --    (TODO: Replace `CharList` with an unordered multiset)
                -> WordSet   -- ^ Result `WordSet` accumulator for recursion. Initially empty
                -> WordSet   -- ^ All found anagrams
 internalSolver wset graph word chars result
