@@ -1,4 +1,4 @@
-### An efficient anagram solver
+## An efficient anagram solver
 
 Solving anagrams for long strings or sentences is a hard problem. A naive
 implementation, which generates all substrings from a given input for looking
